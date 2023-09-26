@@ -14,21 +14,19 @@ import {useRouter} from "next/navigation";
 import {cn} from "@/lib/utils";
 import {Textarea} from "@/components/ui/textarea";
 import {Course} from "@prisma/client";
+import {Combobox} from "@/components/ui/combobox";
 
-
-interface DescriptionFormProps {
+interface CategoryFormProps {
     initialData: Course;
     courseId: string;
+    options: { label: string; value: string }[]
 }
 
 const formSchema = z.object({
-    description: z.string().min(1, {
-        message: 'Description is required'
-    })
+    categoryId: z.string().min(1)
 })
 
-
-export const DescriptionForm = ({initialData, courseId}: DescriptionFormProps) => {
+export const CategoryForm = ({initialData, courseId, options}: CategoryFormProps) => {
     const router = useRouter()
 
     const [isEditing, setIsEditing] = useState<boolean>(false)
@@ -37,7 +35,7 @@ export const DescriptionForm = ({initialData, courseId}: DescriptionFormProps) =
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            description: initialData?.description || ""
+            categoryId: initialData?.categoryId || ""
         }
     })
 
@@ -55,23 +53,25 @@ export const DescriptionForm = ({initialData, courseId}: DescriptionFormProps) =
         }
     }
 
+    const selectedOption = options.find((option) => option.value === initialData.categoryId)
+
     return <div className={'mt-6 border bg-slate-100 rounded-md p-4'}>
         <div className={'font-medium flex items-center justify-between'}>
-            Course description
+            Course category
             <Button onClick={toggleEditing} variant={'ghost'}>
                 {isEditing ? (
                     <>Cancel</>
                 ) : (
                     <>
                         <Pencil className={'h-4 w-4 mr-2'}/>
-                        Edit Description
+                        Edit category
                     </>
                 )}
             </Button>
         </div>
         {!isEditing && (
-            <p className={cn('text-sm mt-2', !initialData.description && "text-slate-500 italic")}>
-                {initialData.description || 'No description'}
+            <p className={cn('text-sm mt-2', !initialData.categoryId && "text-slate-500 italic")}>
+                {selectedOption?.label || 'No Category'}
             </p>
         )}
         {isEditing && (
@@ -81,14 +81,10 @@ export const DescriptionForm = ({initialData, courseId}: DescriptionFormProps) =
                 >
                     <FormField render={({field}) => (<FormItem>
                         <FormControl>
-                            <Textarea
-                                {...field}
-                                disabled={isSubmitting}
-                                placeholder={"e.g. 'This course is about...'"}
-                            />
+                            <Combobox options={...options} onChange={field.onChange} value={field.value}/>
                         </FormControl>
                         <FormMessage/>
-                    </FormItem>)} name={'description'} control={form.control}/>
+                    </FormItem>)} name={'categoryId'} control={form.control}/>
                     <div className={'flex items-center gap-x-2'}>
                         <Button type={'submit'} disabled={!isValid || isSubmitting}>Save</Button>
                     </div>

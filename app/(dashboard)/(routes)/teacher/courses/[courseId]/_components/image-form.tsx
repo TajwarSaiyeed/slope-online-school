@@ -12,17 +12,17 @@ import {ImageIcon, Pencil, PlusCircle} from "lucide-react";
 import {Button} from '@/components/ui/button'
 import {FileUpload} from "@/components/file-upload";
 
-const formSchema = z.object({
-    imageUrl: z.string().min(1, {
-        message: 'Image URL is required'
-    })
-})
 
 interface ImageFormProps {
     initialData: Course;
     courseId: string;
 }
 
+const formSchema = z.object({
+    imageUrl: z.string().min(1, {
+        message: 'Image URL is required'
+    })
+})
 export const ImageForm = ({initialData, courseId}: ImageFormProps) => {
     const router = useRouter()
 

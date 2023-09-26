@@ -13,6 +13,14 @@ import {Form, FormLabel, FormControl, FormDescription, FormMessage, FormItem, Fo
 import toast from "react-hot-toast";
 import {useRouter} from "next/navigation";
 
+interface TitleFormProps {
+    initialData: {
+        title: string;
+    };
+    courseId: string;
+}
+
+
 const formSchema = z.object({
     title: z.string().min(1, {
         message: 'Title is required'
@@ -20,12 +28,6 @@ const formSchema = z.object({
 })
 
 
-interface TitleFormProps {
-    initialData: {
-        title: string;
-    };
-    courseId: string;
-}
 
 export const TitleForm = ({initialData, courseId}: TitleFormProps) => {
     const router = useRouter()
