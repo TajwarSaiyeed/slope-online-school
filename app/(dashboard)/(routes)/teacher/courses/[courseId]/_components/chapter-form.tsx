@@ -3,7 +3,7 @@
 import axios from 'axios';
 import * as z from 'zod';
 import {useState} from "react";
-import {PlusCircle} from "lucide-react";
+import {Loader2, PlusCircle} from "lucide-react";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 
@@ -51,64 +51,89 @@ export const ChaptersForm = ({initialData, courseId}: ChaptersFormProps) => {
             toast.success('Chapter created')
             toggleCreating()
             router.refresh()
+            form.reset()
 
         } catch (error) {
             toast.error('Something went wrong')
         }
     }
 
-    return <div className={'mt-6 border bg-slate-100 rounded-md p-4'}>
-        <div className={'font-medium flex items-center justify-between'}>
-            Course chapters
-            <Button onClick={toggleCreating} variant={'ghost'}>
-                {isCreating ? (
-                    <>Cancel</>
-                ) : (
-                    <>
-                        <PlusCircle className={'h-4 w-4 mr-2'}/>
-                        Add a chapter
-                    </>
-                )}
-            </Button>
-        </div>
-        {isCreating && (
-            <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)}
-                      className={'space-y-8 mt-8'}
-                >
-                    <FormField render={({field}) => (<FormItem>
-                        <FormControl>
-                            <Input
-                                disabled={isSubmitting}
-                                placeholder={"e.g. 'Introduction to the course'"}
-                                {...field}
-                            />
-                        </FormControl>
-                        <FormMessage/>
-                    </FormItem>)} name={'title'} control={form.control}/>
-                    <Button type={'submit'} disabled={!isValid || isSubmitting}>Create</Button>
-                </form>
-            </Form>
-        )}
-        {
-            !isCreating && <div className={cn('text-sm mt-2', !initialData.chapters.length && "italic text-slate-500")}>
-                {!initialData.chapters.length && "No chapters yet!"}
-                <ChaptersList
-                    onEdit={() => {
-                    }}
-                    onReorder={() => {
-                    }}
-                    items={initialData.chapters || []}
-                />
-            </div>
-        }
-        {
-            !isCreating && (
-                <p className={'text-xs text-muted-foreground mt-4'}>
-                    Drag and drop to reorder the chapters
-                </p>
-            )
-        }
+    const onReorder = async (updateData: { id: string, position: number }[]) => {
+        try {
+            setIsUpdating(true)
+            await axios.put(`/api/courses/${courseId}/chapters/reorder`, {
+                list: updateData
+            })
+            toast.success("Chapters Reordered")
+            router.refresh()
 
-    </div>
+        } catch (error) {
+            toast.error('Something went wrong')
+        } finally {
+            setIsUpdating(false)
+        }
+    }
+    const onEdit = (id: string) => {
+        router.push(`/teacher/courses/${courseId}/chapters/${id}`)
+    }
+
+    return (
+        <div className={'relative mt-6 border bg-slate-100 rounded-md p-4'}>
+            {isUpdating && <div
+                className={'absolute h-full w-full bg-slate-500/20 top-0 right-0 rounded-md flex items-center justify-center'}>
+                <Loader2 className={'animate-spin h-6 w-6 text-sky-700'}/>
+            </div>}
+            <div className={'font-medium flex items-center justify-between'}>
+                Course chapters
+                <Button onClick={toggleCreating} variant={'ghost'}>
+                    {isCreating ? (
+                        <>Cancel</>
+                    ) : (
+                        <>
+                            <PlusCircle className={'h-4 w-4 mr-2'}/>
+                            Add a chapter
+                        </>
+                    )}
+                </Button>
+            </div>
+            {isCreating && (
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)}
+                          className={'space-y-8 mt-8'}
+                    >
+                        <FormField render={({field}) => (<FormItem>
+                            <FormControl>
+                                <Input
+                                    disabled={isSubmitting}
+                                    placeholder={"e.g. 'Introduction to the course'"}
+                                    {...field}
+                                />
+                            </FormControl>
+                            <FormMessage/>
+                        </FormItem>)} name={'title'} control={form.control}/>
+                        <Button type={'submit'} disabled={!isValid || isSubmitting}>Create</Button>
+                    </form>
+                </Form>
+            )}
+            {
+                !isCreating &&
+                <div className={cn('text-sm mt-2', !initialData.chapters.length && "italic text-slate-500")}>
+                    {!initialData.chapters.length && "No chapters yet!"}
+                    <ChaptersList
+                        onEdit={onEdit}
+                        onReorder={onReorder}
+                        items={initialData.chapters || []}
+                    />
+                </div>
+            }
+            {
+                !isCreating && (
+                    <p className={'text-xs text-muted-foreground mt-4'}>
+                        Drag and drop to reorder the chapters
+                    </p>
+                )
+            }
+
+        </div>
+    )
 }
