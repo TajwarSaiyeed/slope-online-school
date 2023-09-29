@@ -2,6 +2,53 @@ import {NextResponse} from "next/server";
 import {auth} from "@clerk/nextjs";
 import {db} from "@/lib/db";
 
+export async function DELETE(req: Request, {params}: {
+    params: {
+        courseId: string
+    }
+}) {
+    try {
+        const {userId} = auth()
+        if (!userId) return new NextResponse("Unauthenticated", {status: 401})
+
+        const course = await db.course.findUnique({
+            where: {
+                id: params.courseId,
+                userId
+            },
+            include: {
+                chapters: true
+            }
+        })
+
+        if (!course) {
+            return new NextResponse("Not found", {status: 404})
+        }
+        //
+        // const chapterIds = course.chapters.map(chapter => chapter.id)
+        // const deletedChapters = await db.chapter.deleteMany({
+        //     where: {
+        //         id: {
+        //             in : chapterIds
+        //         }
+        //     }
+        // })
+
+        const deletedCourse = await db.course.delete({
+            where: {
+                id: params.courseId
+            }
+        })
+
+        return NextResponse.json(deletedCourse, {status: 200})
+
+
+    } catch (error) {
+        console.log("[COURSE_ID_DELETE]", error)
+        return new NextResponse("Internal Error", {status: 500})
+    }
+}
+
 export async function PATCH(req: Request, {params}: {
     params: {
         courseId: string
@@ -27,7 +74,7 @@ export async function PATCH(req: Request, {params}: {
 
 
     } catch (error) {
-        console.log("[COURSE_PATCH]", error)
-        return new NextResponse("Something went wrong", {status: 500})
+        console.log("[COURSE_ID_PATCH]", error)
+        return new NextResponse("Internal Error", {status: 500})
     }
 }

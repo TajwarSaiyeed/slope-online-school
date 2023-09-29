@@ -50,7 +50,7 @@ const CreatePage = () => {
                         <FormField render={({field}) => (<FormItem>
                             <FormLabel htmlFor={'title'}>Course Title</FormLabel>
                             <FormControl>
-                                <Input {...field} id={'title'} placeholder={"e.g. 'HSC Physics Chapter 1'"}/>
+                                <Input {...field} id={'title'} placeholder={"e.g. 'HSC Physics'"}/>
                             </FormControl>
                             <FormDescription>
                                 What will you teach in this course?
