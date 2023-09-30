@@ -30,6 +30,7 @@ export const VideoPlayer = ({
                                 videoUrl
                             }: VideoPlayerProps) => {
 
+
     const [isReady, setIsReady] = useState<boolean>(false);
 
     useEffect(() => {
@@ -59,8 +60,15 @@ export const VideoPlayer = ({
         {!isLocked && (
             <div className={'relative aspect-video border border-slate-100 rounded-md'}>
                 <iframe
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    allowFullScreen src={videoUrl} className={cn('w-full h-full rounded-md', !isReady && 'hidden')}>
+                    onEncrypted={() => {
+                        setIsReady(true)
+
+                    }}
+                    className={cn('w-full h-full rounded-md', !isReady && 'hidden')}
+                    src={videoUrl}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                >
                 </iframe>
 
                 <div className={'absolute top-4 right-4 w-10 h-10'}>
