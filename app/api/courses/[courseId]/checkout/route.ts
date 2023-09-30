@@ -55,8 +55,8 @@ export async function GET(req: Request) {
                 })
                 return NextResponse.json(null, {status: 200})
             }
+            return NextResponse.json(null, {status: 200})
         }
-        return NextResponse.json(null, {status: 200})
     } catch (error) {
         console.log('PURCHASE_GET', error)
     }
