@@ -47,7 +47,7 @@ export async function GET(req: Request) {
             })
 
             if (purchase) {
-                return NextResponse.json(null, {status: 200})
+                return new NextResponse(null, {status: 200})
             }
             await db.purchase.create({
                 data: {
@@ -55,11 +55,12 @@ export async function GET(req: Request) {
                     userId: checkoutSession?.metadata?.userId!,
                 }
             })
-            return NextResponse.json(null, {status: 200})
+            return new NextResponse(null, {status: 200})
         }
-        return NextResponse.json(null, {status: 200})
+        return new NextResponse(null, {status: 200})
     } catch (error) {
         console.log('PURCHASE_GET', error)
+        return new NextResponse("Internal Error", {status: 500})
     }
 }
 
