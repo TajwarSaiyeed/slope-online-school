@@ -17,27 +17,30 @@ export async function DELETE(req: Request, {params}: {
                 userId
             },
             include: {
-                chapters: true
+                chapters: {
+                    include: {
+                        userProgress: true
+                    }
+                }
             }
         })
 
         if (!course) {
             return new NextResponse("Not found", {status: 404})
         }
-        //
-        // const chapterIds = course.chapters.map(chapter => chapter.id)
-        // const deletedChapters = await db.chapter.deleteMany({
-        //     where: {
-        //         id: {
-        //             in : chapterIds
-        //         }
-        //     }
-        // })
+
+        for (const chapter of course.chapters) {
+            await db.userProgress.deleteMany({
+                where: {
+                    chapterId: chapter.id,
+                },
+            });
+        }
 
         const deletedCourse = await db.course.delete({
             where: {
                 id: params.courseId
-            }
+            },
         })
 
         return NextResponse.json(deletedCourse, {status: 200})

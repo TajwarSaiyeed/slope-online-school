@@ -46,15 +46,15 @@ export async function GET(req: Request) {
                 }
             })
 
-            if (!purchase) {
-                await db.purchase.create({
-                    data: {
-                        courseId: checkoutSession?.metadata?.courseId!,
-                        userId: checkoutSession?.metadata?.userId!,
-                    }
-                })
+            if (purchase) {
                 return NextResponse.json(null, {status: 200})
             }
+            await db.purchase.create({
+                data: {
+                    courseId: checkoutSession?.metadata?.courseId!,
+                    userId: checkoutSession?.metadata?.userId!,
+                }
+            })
             return NextResponse.json(null, {status: 200})
         }
     } catch (error) {
