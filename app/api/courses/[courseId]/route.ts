@@ -1,6 +1,7 @@
 import {NextResponse} from "next/server";
 import {auth} from "@clerk/nextjs";
 import {db} from "@/lib/db";
+import {isTeacher} from "@/lib/teacher";
 
 export async function DELETE(req: Request, {params}: {
     params: {
@@ -9,7 +10,7 @@ export async function DELETE(req: Request, {params}: {
 }) {
     try {
         const {userId} = auth()
-        if (!userId) return new NextResponse("Unauthenticated", {status: 401})
+        if (!userId || !isTeacher(userId)) return new NextResponse("Unauthenticated", {status: 401})
 
         const course = await db.course.findUnique({
             where: {
