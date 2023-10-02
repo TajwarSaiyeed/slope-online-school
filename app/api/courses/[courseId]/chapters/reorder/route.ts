@@ -1,34 +1,40 @@
-import {NextResponse} from "next/server";
-import {auth} from "@clerk/nextjs";
-import {db} from "@/lib/db";
+import { auth } from "@clerk/nextjs";
+import { NextResponse } from "next/server";
 
-export async function PUT(req: Request, {params} : {
-    params: {courseId: string}
-}) {
-    try {
-        const {userId} = auth()
-        if(!userId) return new NextResponse("Unauthenticated", {status: 401})
-        const {list} = await req.json()
+import { db } from "@/lib/db";
 
-        const ownCourse = await db.course.findUnique({
-            where: {
-                id: params.courseId,
-                userId
-            }
-        })
+export async function PUT(
+  req: Request,
+  {
+    params,
+  }: {
+    params: { courseId: string };
+  }
+) {
+  try {
+    const { userId } = auth();
+    if (!userId) return new NextResponse("Unauthenticated", { status: 401 });
+    const { list } = await req.json();
 
-        if (!ownCourse) return new NextResponse("Unauthorized", {status: 403})
+    const ownCourse = await db.course.findUnique({
+      where: {
+        id: params.courseId,
+        userId,
+      },
+    });
 
-        for (let item of list) {
-            await db.chapter.update({
-                where: {id: item.id},
-                data: { position : item.position}
-            })
-        }
+    if (!ownCourse) return new NextResponse("Unauthorized", { status: 403 });
 
-        return new NextResponse("Success", {status: 200})
-    } catch (error) {
-        console.log('[COURSE_REORDER_PUT]', error);
-        return new NextResponse("Internal Server Error", {status: 500})
+    for (let item of list) {
+      await db.chapter.update({
+        where: { id: item.id },
+        data: { position: item.position },
+      });
     }
+
+    return new NextResponse("Success", { status: 200 });
+  } catch (error) {
+    console.log("[COURSE_REORDER_PUT]", error);
+    return new NextResponse("Internal Server Error", { status: 500 });
+  }
 }

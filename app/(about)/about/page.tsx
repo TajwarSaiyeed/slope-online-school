@@ -1,12 +1,12 @@
-import React from 'react';
-import {Header} from "./_components/header";
+"use client";
+import { Header } from "./_components/header";
 
 const AboutPage = () => {
-    return (
-        <>
-            <Header />
-        </>
-    );
+  return (
+    <>
+      <Header />
+    </>
+  );
 };
 
 export default AboutPage;

@@ -1,33 +1,37 @@
-import {NextResponse} from "next/server";
-import {auth} from "@clerk/nextjs";
-import {db} from "@/lib/db";
+import { auth } from "@clerk/nextjs";
+import { NextResponse } from "next/server";
 
-export async function POST(req: Request, {params}: { params: { courseId: string } }) {
-    try {
-        const {userId} = auth()
-        const {url} = await req.json()
-        if (!userId) return new NextResponse("Unauthenticated", {status: 401})
+import { db } from "@/lib/db";
 
-        const courseOwner = await db.course.findUnique({
-            where: {
-                id: params.courseId,
-                userId
-            }
-        })
+export async function POST(
+  req: Request,
+  { params }: { params: { courseId: string } }
+) {
+  try {
+    const { userId } = auth();
+    const { url } = await req.json();
+    if (!userId) return new NextResponse("Unauthenticated", { status: 401 });
 
-        if (!courseOwner) return new NextResponse("Unauthorized", {status: 403})
+    const courseOwner = await db.course.findUnique({
+      where: {
+        id: params.courseId,
+        userId,
+      },
+    });
 
-        const attachment = await db.attachment.create({
-            data: {
-                url,
-                name: url.split("/").pop(),
-                courseId: params.courseId
-            }
-        })
+    if (!courseOwner) return new NextResponse("Unauthorized", { status: 403 });
 
-        return NextResponse.json(attachment, {status: 201})
-    } catch (error) {
-        console.log("[COURSE_ID_ATTACHMENTS_POST]", error);
-        return new NextResponse("Internal Server Error", {status: 500})
-    }
+    const attachment = await db.attachment.create({
+      data: {
+        url,
+        name: url.split("/").pop(),
+        courseId: params.courseId,
+      },
+    });
+
+    return NextResponse.json(attachment, { status: 201 });
+  } catch (error) {
+    console.log("[COURSE_ID_ATTACHMENTS_POST]", error);
+    return new NextResponse("Internal Server Error", { status: 500 });
+  }
 }
