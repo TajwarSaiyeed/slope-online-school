@@ -3,18 +3,36 @@
 import { BarChart, Compass, Layout, List } from "lucide-react";
 import { SidebarItem } from "./sidebar-item";
 import { usePathname } from "next/navigation";
+import {MdOutlineLeaderboard} from "react-icons/md";
+import {LuFileEdit} from "react-icons/lu";
+import {FiMail} from "react-icons/fi";
 
 const guestRoutes = [
+  {
+    icon: Compass,
+    label: "Browse",
+    href: "/search",
+  },
   {
     icon: Layout,
     label: "Dashboard",
     href: "/",
   },
   {
-    icon: Compass,
-    label: "Browse",
-    href: "/search",
+    icon: MdOutlineLeaderboard,
+    label: "Leaderboard",
+    href: "/leaderboard",
   },
+  {
+    icon: LuFileEdit,
+    label: "Quiz",
+    href: "/quiz",
+  },
+  {
+    icon: FiMail,
+    label: "Newsletter",
+    href: "/newsletter",
+  }
 ];
 const teacherRoutes = [
   {

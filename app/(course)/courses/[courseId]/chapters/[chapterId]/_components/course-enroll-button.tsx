@@ -27,6 +27,9 @@ export const CourseEnrollButton = ({
       setIsLoading(false);
     }
   };
+
+  console.log(price)
+
   return (
     <Button
       disabled={isLoading}
@@ -34,7 +37,7 @@ export const CourseEnrollButton = ({
       size={"sm"}
       className={"w-full md:w-auto"}
     >
-      Enroll for {formatPrice(price)}
+      Enroll for {price === 0 ? "free" : formatPrice(price)}
     </Button>
   );
 };
